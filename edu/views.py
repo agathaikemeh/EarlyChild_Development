@@ -1,77 +1,145 @@
-from rest_framework.views import APIView
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
-import logging
-from .models import Resource
-from .serializers import ResourceSerializer
+from rest_framework.exceptions import NotFound
+from .models import UserProfile, ChildProfile, Resource, PhoneticsModule, MathModule, STEMModule
+from .serializers import (
+    UserProfileSerializer, 
+    ChildProfileSerializer, 
+    ResourceSerializer, 
+    PhoneticsModuleSerializer, 
+    MathModuleSerializer, 
+    STEMModuleSerializer
+)
 
-# Setup logging
-logger = logging.getLogger(__name__)
+# Base mixin for shared functionality and error handling
+class BaseViewMixin:
+    def handle_exception(self, exc):
+        """
+        Custom error response handler.
+        """
+        if isinstance(exc, NotFound):
+            return Response({"error": "Resource not found."}, status=status.HTTP_404_NOT_FOUND)
+        return super().handle_exception(exc)
 
-class ResourceListCreate(APIView):
+# User Profile Views
+class UserProfileListCreateView(BaseViewMixin, generics.ListCreateAPIView):
     """
-    Handle listing all resources (GET) and creating a new resource (POST).
+    API view for listing and creating user profiles.
     """
-    def get(self, request):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
         """
-        Handles GET requests to fetch all resources.
-
-        Args:
-            request: The incoming HTTP request.
-
-        Returns:
-            Response: A JSON response with serialized resource data.
+        Save the user profile associated with the authenticated user.
         """
-        # Log the user making the request (if authenticated)
-        user = request.user if request.user.is_authenticated else "Anonymous"
-        logger.info(f"GET request received by {user}")
+        try:
+            serializer.save(user=self.request.user)
+        except Exception as e:
+            return Response(
+                {"error": f"Failed to create user profile: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        resources = Resource.objects.all()  # Fetch all resources
-        serializer = ResourceSerializer(resources, many=True)  # Serialize the data
-        return Response(serializer.data)  # Return JSON response
-
-    def post(self, request):
-        """
-        Handles POST requests to create a new resource.
-
-        Args:
-            request: The incoming HTTP request with the data.
-
-        Returns:
-            Response: A JSON response with the created resource data or errors.
-        """
-        # Log the user making the request (if authenticated)
-        user = request.user if request.user.is_authenticated else "Anonymous"
-        logger.info(f"POST request received by {user} with data: {request.data}")
-
-        serializer = ResourceSerializer(data=request.data)  # Deserialize input data
-        if serializer.is_valid():  # Validate data
-            serializer.save()  # Save the new resource
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ProtectedResourceView(APIView):
+class UserProfileDetailView(BaseViewMixin, generics.RetrieveUpdateDestroyAPIView):
     """
-    Example of a protected API endpoint.
+    API view for retrieving, updating, and deleting a user profile.
     """
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [TokenAuthentication]  # Ensure TokenAuthentication is used
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request):
+    def get_object(self):
         """
-        Handles GET requests to return a protected message.
-
-        Args:
-            request: The incoming HTTP request.
-
-        Returns:
-            Response: A JSON response with a protected message.
+        Override to handle the case where a user profile does not exist.
         """
-        # Log the authenticated user making the request
-        user = request.user
-        logger.info(f"Protected resource accessed by {user.username}")
+        try:
+            return super().get_object()
+        except UserProfile.DoesNotExist:
+            raise NotFound("The requested user profile does not exist.")
 
-        return Response({"message": f"This is a protected resource, accessed by {user.username}."})
+# Child Profile Views
+class ChildProfileListCreateView(BaseViewMixin, generics.ListCreateAPIView):
+    """
+    API view for listing and creating child profiles.
+    """
+    queryset = ChildProfile.objects.all()
+    serializer_class = ChildProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class ChildProfileDetailView(BaseViewMixin, generics.RetrieveUpdateDestroyAPIView):
+    """
+    API view for retrieving, updating, and deleting a child profile.
+    """
+    queryset = ChildProfile.objects.all()
+    serializer_class = ChildProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+# Resource Views
+class ResourceListCreateView(BaseViewMixin, generics.ListCreateAPIView):
+    """
+    API view for listing and creating educational resources.
+    """
+    queryset = Resource.objects.all()
+    serializer_class = ResourceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class ResourceDetailView(BaseViewMixin, generics.RetrieveUpdateDestroyAPIView):
+    """
+    API view for retrieving, updating, and deleting a specific resource.
+    """
+    queryset = Resource.objects.all()
+    serializer_class = ResourceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+# Phonetics Module Views
+class PhoneticsModuleListCreateView(BaseViewMixin, generics.ListCreateAPIView):
+    """
+    API view for listing and creating phonetics modules.
+    """
+    queryset = PhoneticsModule.objects.all()
+    serializer_class = PhoneticsModuleSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class PhoneticsModuleDetailView(BaseViewMixin, generics.RetrieveUpdateDestroyAPIView):
+    """
+    API view for retrieving, updating, and deleting a phonetics module.
+    """
+    queryset = PhoneticsModule.objects.all()
+    serializer_class = PhoneticsModuleSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+# Math Module Views
+class MathModuleListCreateView(BaseViewMixin, generics.ListCreateAPIView):
+    """
+    API view for listing and creating math modules.
+    """
+    queryset = MathModule.objects.all()
+    serializer_class = MathModuleSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class MathModuleDetailView(BaseViewMixin, generics.RetrieveUpdateDestroyAPIView):
+    """
+    API view for retrieving, updating, and deleting a math module.
+    """
+    queryset = MathModule.objects.all()
+    serializer_class = MathModuleSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+# STEM Module Views
+class STEMModuleListCreateView(BaseViewMixin, generics.ListCreateAPIView):
+    """
+    API view for listing and creating STEM modules.
+    """
+    queryset = STEMModule.objects.all()
+    serializer_class = STEMModuleSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class STEMModuleDetailView(BaseViewMixin, generics.RetrieveUpdateDestroyAPIView):
+    """
+    API view for retrieving, updating, and deleting a STEM module.
+    """
+    queryset = STEMModule.objects.all()
+    serializer_class = STEMModuleSerializer
+    permission_classes = [permissions.IsAuthenticated]

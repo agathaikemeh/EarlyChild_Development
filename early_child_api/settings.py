@@ -122,7 +122,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',  # Default permission: Only authenticated users
     ],
-    # Optional: You can also add pagination and other configurations here
+    # Pagination settings
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',  # Use page number pagination
+    'PAGE_SIZE': 10,  # Specify the number of items per page
 }
 
 # Optional: Add the following to support Token Authentication more seamlessly
