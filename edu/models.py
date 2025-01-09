@@ -10,28 +10,34 @@ class UserProfile(models.Model):
         ('teacher', 'Teacher'),
         ('admin', 'Admin'),
     ]
-    username = models.CharField(max_length=100)  # Username for the user
-    email = models.EmailField(unique=True)      # Email of the user
+    username = models.CharField(max_length=100, unique=True)  # Ensure unique usernames
+    email = models.EmailField(unique=True)                   # Email must be unique
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)  # Role of the user
     created_at = models.DateTimeField(auto_now_add=True)  # Auto-set at creation
     updated_at = models.DateTimeField(auto_now=True)      # Auto-update on save
 
     def __str__(self):
-        return self.username
+        return f"{self.username} ({self.role})"  # Include role in string representation
+
 
 # Child Profile Model
 class ChildProfile(models.Model):
     """
     Model to represent child profiles for tracking learning progress.
     """
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="children")  # Parent/Teacher link
-    name = models.CharField(max_length=100)  # Child's name
-    age = models.PositiveIntegerField()      # Child's age
+    user = models.ForeignKey(
+        UserProfile, 
+        on_delete=models.CASCADE, 
+        related_name="children"
+    )  # Parent/Teacher link
+    name = models.CharField(max_length=100)   # Child's name
+    age = models.PositiveIntegerField()       # Child's age
     created_at = models.DateTimeField(auto_now_add=True)  # Auto-set at creation
     updated_at = models.DateTimeField(auto_now=True)      # Auto-update on save
 
     def __str__(self):
-        return self.name
+        return f"{self.name} (Age: {self.age})"
+
 
 # Educational Resource Model
 class Resource(models.Model):
@@ -47,6 +53,7 @@ class Resource(models.Model):
     def __str__(self):
         return self.title
 
+
 # Phonetics Module Model
 class PhoneticsModule(models.Model):
     """
@@ -54,13 +61,18 @@ class PhoneticsModule(models.Model):
     """
     title = models.CharField(max_length=255)  # Title of the phonetics module
     description = models.TextField()          # Description of the module
-    audio_file = models.FileField(upload_to='phonetics_audio/')  # Audio file for learning
+    audio_file = models.FileField(
+        upload_to='phonetics_audio/', 
+        blank=True, 
+        null=True
+    )  # Allow blank or null files for flexibility
     resources = models.ManyToManyField(Resource, blank=True)  # Related educational resources
     created_at = models.DateTimeField(auto_now_add=True)  # Auto-set at creation
     updated_at = models.DateTimeField(auto_now=True)      # Auto-update on save
 
     def __str__(self):
         return self.title
+
 
 # Mathematics Module Model
 class MathModule(models.Model):
@@ -69,13 +81,22 @@ class MathModule(models.Model):
     """
     title = models.CharField(max_length=255)  # Title of the math module
     description = models.TextField()          # Description of the module
-    difficulty_level = models.CharField(max_length=50, default="Easy")  # Difficulty level
+    difficulty_level = models.CharField(
+        max_length=50, 
+        default="Easy", 
+        choices=[
+            ('Easy', 'Easy'),
+            ('Medium', 'Medium'),
+            ('Hard', 'Hard'),
+        ]
+    )  # Added predefined difficulty choices
     resources = models.ManyToManyField(Resource, blank=True)  # Related educational resources
     created_at = models.DateTimeField(auto_now_add=True)  # Auto-set at creation
     updated_at = models.DateTimeField(auto_now=True)      # Auto-update on save
 
     def __str__(self):
-        return self.title
+        return f"{self.title} ({self.difficulty_level})"
+
 
 # STEM Module Model
 class STEMModule(models.Model):
@@ -91,5 +112,6 @@ class STEMModule(models.Model):
 
     def __str__(self):
         return self.title
+
 
 

@@ -1,78 +1,79 @@
 from django.urls import path
 from . import views
 
-# Define URL patterns for the educational app
+app_name = 'edu'  # Namespace for this app
+
 urlpatterns = [
     # User Profile Endpoints
     path(
-        'user-profiles/', 
-        views.UserProfileListCreateView.as_view(), 
-        name='user-profile-list-create'
-    ),  # Endpoint for listing and creating user profiles
+        'v1/user-profiles/',
+        views.UserProfileListCreateView.as_view(),
+        name='user-profiles-list'
+    ),
     path(
-        'user-profiles/<int:pk>/', 
-        views.UserProfileDetailView.as_view(), 
+        'v1/user-profiles/<int:pk>/',
+        views.UserProfileDetailView.as_view(),
         name='user-profile-detail'
-    ),  # Endpoint for retrieving, updating, and deleting a specific user profile
+    ),
 
     # Child Profile Endpoints
     path(
-        'child-profiles/', 
-        views.ChildProfileListCreateView.as_view(), 
-        name='child-profile-list-create'
-    ),  # Endpoint for listing and creating child profiles
+        'v1/child-profiles/',
+        views.ChildProfileListCreateView.as_view(),
+        name='child-profiles-list'
+    ),
     path(
-        'child-profiles/<int:pk>/', 
-        views.ChildProfileDetailView.as_view(), 
+        'v1/child-profiles/<int:pk>/',
+        views.ChildProfileDetailView.as_view(),
         name='child-profile-detail'
-    ),  # Endpoint for retrieving, updating, and deleting a specific child profile
+    ),
 
     # Resource Endpoints
     path(
-        'resources/', 
-        views.ResourceListCreateView.as_view(), 
-        name='resource-list-create'
-    ),  # Endpoint for listing and creating resources
+        'v1/resources/',
+        views.ResourceListCreateView.as_view(),
+        name='resources-list'
+    ),
     path(
-        'resources/<int:pk>/', 
-        views.ResourceDetailView.as_view(), 
+        'v1/resources/<int:pk>/',
+        views.ResourceDetailView.as_view(),
         name='resource-detail'
-    ),  # Endpoint for retrieving, updating, and deleting a specific resource
+    ),
 
     # Phonetics Module Endpoints
     path(
-        'phonetics-modules/', 
-        views.PhoneticsModuleListCreateView.as_view(), 
-        name='phonetics-module-list-create'
-    ),  # Endpoint for listing and creating phonetics modules
+        'v1/phonetics-modules/',
+        views.PhoneticsModuleListCreateView.as_view(),
+        name='phonetics-modules-list'
+    ),
     path(
-        'phonetics-modules/<int:pk>/', 
-        views.PhoneticsModuleDetailView.as_view(), 
+        'v1/phonetics-modules/<int:pk>/',
+        views.PhoneticsModuleDetailView.as_view(),
         name='phonetics-module-detail'
-    ),  # Endpoint for retrieving, updating, and deleting a specific phonetics module
+    ),
 
     # Math Module Endpoints
     path(
-        'math-modules/', 
-        views.MathModuleListCreateView.as_view(), 
-        name='math-module-list-create'
-    ),  # Endpoint for listing and creating math modules
+        'v1/math-modules/',
+        views.MathModuleListCreateView.as_view(),
+        name='math-modules-list'
+    ),
     path(
-        'math-modules/<int:pk>/', 
-        views.MathModuleDetailView.as_view(), 
+        'v1/math-modules/<int:pk>/',
+        views.MathModuleDetailView.as_view(),
         name='math-module-detail'
-    ),  # Endpoint for retrieving, updating, and deleting a specific math module
+    ),
 
     # STEM Module Endpoints
     path(
-        'stem-modules/', 
-        views.STEMModuleListCreateView.as_view(), 
-        name='stem-module-list-create'
-    ),  # Endpoint for listing and creating STEM modules
+        'v1/stem-modules/',
+        views.STEMModuleListCreateView.as_view(),
+        name='stem-modules-list'
+    ),
     path(
-        'stem-modules/<int:pk>/', 
-        views.STEMModuleDetailView.as_view(), 
+        'v1/stem-modules/<int:pk>/',
+        views.STEMModuleDetailView.as_view(),
         name='stem-module-detail'
-    ),  # Endpoint for retrieving, updating, and deleting a specific STEM module
+    ),
 ]
 

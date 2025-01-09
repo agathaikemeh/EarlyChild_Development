@@ -1,29 +1,30 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse
+from django.conf import settings
+from django.conf.urls.static import static
 
 def homepage(request):
     """
     A simple homepage view that returns a JSON response.
-    This view will show a welcome message when visiting the root URL.
     """
     return JsonResponse({
         "message": "Welcome to the Early Child API. Go to /api/ to interact with the API."
     })
 
 urlpatterns = [
-    path('', homepage),  # Root path that returns a JSON response with a welcome message.
-    path('admin/', admin.site.urls),  # Admin dashboard path.
-
-    # Include URLs for the 'edu' app.
-    path('api/', include('edu.urls')),  
-
-    # Example: Other apps can also be included here in a similar manner.
+    path('', homepage),  # Root path
+    path('admin/', admin.site.urls),  # Admin dashboard
+    path('api/', include('edu.urls')),  # Include URLs for the 'edu' app
+    # Add other app URLs here
 ]
 
-# Comments:
-# 1. The `homepage` function serves as a quick welcome response for the root URL.
-# 2. `path('admin/', admin.site.urls)` is the built-in admin site.
-# 3. `path('api/', include('edu.urls'))` directs API-related requests to the `edu` app.
-# 4. Additional apps or functionalities can be added as needed using `path()` or `include()`.
+# Serve static and media files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# Add custom error handlers if desired
+# handler404 = 'my_project.views.custom_404'
+# handler500 = 'my_project.views.custom_500'
 
