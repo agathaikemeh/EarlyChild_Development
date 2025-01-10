@@ -14,7 +14,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -26,7 +25,7 @@ INSTALLED_APPS = [
     'edu',  # Your custom app
     'rest_framework',
     'rest_framework.authtoken',
-    'django.contrib.sites', 
+    'django.contrib.sites',
     'django.contrib.sitemaps',
     'django_filters',
 ]
@@ -61,10 +60,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'early_child_api.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -72,10 +69,8 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -91,10 +86,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -103,18 +96,21 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / "static"]  # Directory for additional static files
+STATIC_ROOT = BASE_DIR / "staticfiles"  # Directory where collectstatic will store files
 
-STATIC_URL = 'static/'
+# Media files (User-uploaded content)
+MEDIA_URL = '/media/'  # URL to access media files
+MEDIA_ROOT = BASE_DIR / "media"  # Directory to store uploaded media files
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+# REST Framework settings
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -139,5 +135,10 @@ REST_FRAMEWORK = {
     },
 }
 
-# Optional: Add the following to support Token Authentication more seamlessly
-# You might need to add `rest_framework.authtoken` to the URL configuration if not already done
+# Development settings for static and media files
+if DEBUG:
+    from django.conf.urls.static import static
+    from django.conf import settings
+    urlpatterns = []
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

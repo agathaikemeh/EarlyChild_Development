@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import UserProfile, ChildProfile, Resource, PhoneticsModule, MathModule, STEMModule
 
+
 # Serializer for UserProfile
 class UserProfileSerializer(serializers.ModelSerializer):
     """
@@ -28,6 +29,27 @@ class UserProfileSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("This username is already taken.")
         return value
 
+    def validate_role(self, value):
+        """
+        Validate that the role is one of the predefined choices.
+        """
+        valid_roles = [choice[0] for choice in UserProfile.ROLE_CHOICES]
+        if value not in valid_roles:
+            raise serializers.ValidationError(f"Invalid role. Valid roles are: {', '.join(valid_roles)}.")
+        return value
+
+    def create(self, validated_data):
+        """
+        Override the create method to handle the creation of a UserProfile.
+        """
+        user_profile = UserProfile.objects.create(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            role=validated_data['role'],
+        )
+        return user_profile
+
+
 # Serializer for ChildProfile
 class ChildProfileSerializer(serializers.ModelSerializer):
     """
@@ -40,21 +62,18 @@ class ChildProfileSerializer(serializers.ModelSerializer):
         model = ChildProfile
         fields = ['id', 'user', 'name', 'age', 'created_at', 'updated_at']
 
-    def validate_age(self, value):
+    def create(self, validated_data):
         """
-        Validate that age is a positive integer between 0 and 18.
+        Override the create method to handle the creation of a ChildProfile.
         """
-        if not (0 <= value <= 18):
-            raise serializers.ValidationError("Age must be between 0 and 18.")
-        return value
+        # Extract the user from the context
+        user = self.context.get('user')
+        if not user:
+            raise serializers.ValidationError("User must be provided.")
+        
+        # Create the child profile with the provided user and validated data
+        return ChildProfile.objects.create(user=user, **validated_data)
 
-    def validate_name(self, value):
-        """
-        Ensure the name is not empty and is at least 2 characters long.
-        """
-        if len(value.strip()) < 2:
-            raise serializers.ValidationError("Name must be at least 2 characters long.")
-        return value
 
 # Serializer for Resource
 class ResourceSerializer(serializers.ModelSerializer):
@@ -74,6 +93,7 @@ class ResourceSerializer(serializers.ModelSerializer):
         if not value.startswith(('http://', 'https://')):
             raise serializers.ValidationError("Content URL must start with 'http://' or 'https://'.")
         return value
+
 
 # Serializer for PhoneticsModule
 class PhoneticsModuleSerializer(serializers.ModelSerializer):
@@ -95,6 +115,7 @@ class PhoneticsModuleSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Title must be at least 3 characters long.")
         return value
 
+
 # Serializer for MathModule
 class MathModuleSerializer(serializers.ModelSerializer):
     """
@@ -109,11 +130,12 @@ class MathModuleSerializer(serializers.ModelSerializer):
 
     def validate_difficulty_level(self, value):
         """
-        Validate the difficulty level is within acceptable range (e.g., 1 to 5).
+        Validate the difficulty level is within an acceptable range (e.g., 1 to 5).
         """
         if not (1 <= value <= 5):
             raise serializers.ValidationError("Difficulty level must be between 1 and 5.")
         return value
+
 
 # Serializer for STEMModule
 class STEMModuleSerializer(serializers.ModelSerializer):

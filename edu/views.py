@@ -39,6 +39,14 @@ class IsOwnerOrAdmin(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user.is_staff or obj.user == request.user
 
+class IsAdminOrResourceCreator(permissions.BasePermission):
+    """
+    Custom permission to allow only admins or users in the 'resource_creator' group to create resources.
+    """
+    def has_permission(self, request, view):
+        # Check if the user is an admin or in the 'resource_creator' group
+        return request.user.is_staff or request.user.groups.filter(name='resource_creator').exists()
+
 # User Profile Views
 class UserProfileListCreateView(BaseViewMixin, generics.ListCreateAPIView):
     """
@@ -94,6 +102,7 @@ class ResourceListCreateView(BaseViewMixin, generics.ListCreateAPIView):
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['category', 'level']
+    permission_classes = BaseViewMixin.permission_classes + [IsAdminOrResourceCreator]
 
 class ResourceDetailView(BaseViewMixin, generics.RetrieveUpdateDestroyAPIView):
     """
